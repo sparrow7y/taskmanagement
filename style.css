@@ -12,7 +12,7 @@ main {
   border-radius: 18px;
   box-shadow: 0 0 32px 10px #000c, 0 0 0 8px #18120c inset;
   border: 8px solid #7a5a2f;
-  border-image: #7a5a2f 30 round;
+  border-image: #1abc9c 30 round;
   font-size: 1.25em;
   color: #3a2d1a;
   position: relative;
