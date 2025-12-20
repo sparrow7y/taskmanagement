@@ -8,16 +8,96 @@
     <script defer src="script.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Task Management Project</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="style.css">Stylesheet</a>
-            <a href="script.js">JavaScript</a>
-        </nav>
-    </header>
-<div class="main-content">
-    <h2>Welcome to the Task Management Application</h2>
-    <p>This application helps you manage your tasks efficiently. Please log in to access your task dashboard.</p>
-</div>
+    <div class="container">
+        <!-- Section principale -->
+        <div class="main-section">
+            <!-- Onglets -->
+            <div class="tabs">
+                <button class="tab active" data-tab="paterne1">
+                    paterne 1 <span class="tab-close">×</span>
+                </button>
+                <button class="tab-add">+</button>
+            </div>
+
+            <!-- Contenu -->
+            <div class="content">
+                <!-- Catégorie Nourriture -->
+                <div class="category">
+                    <h2 class="category-title">nourriture</h2>
+                    <ul class="task-list" id="nourriture-list">
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Acheter des légumes</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Préparer le repas</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Faire les courses</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Commander pizza</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Catégorie Vêtements -->
+                <div class="category">
+                    <h2 class="category-title">vêtements</h2>
+                    <ul class="task-list" id="vetements-list">
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Laver le linge</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Repasser chemises</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Acheter chaussures</span>
+                        </li>
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <span class="task-text">Ranger armoire</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau latéral -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Paternes</h3>
+            </div>
+            <ul class="pattern-list">
+                <li class="pattern-item active">paterne 1</li>
+                <li class="pattern-item">paterne 2</li>
+            </ul>
+            <button class="add-pattern-btn">add paterne</button>
+
+            <!-- Section Markdown -->
+            <div class="markdown-section">
+                <h3 class="markdown-title">markdown</h3>
+                <textarea class="markdown-editor" placeholder="Écrivez votre markdown ici...
+# Titre
+## Sous-titre
+- Liste à puces
+**Gras** *Italique*">## Notes
+- Tâche 1
+- Tâche 2
+
+### Important
+N'oubliez pas de vérifier les **courses** demain.</textarea>
+                <div class="markdown-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
+</html>

@@ -15,7 +15,7 @@
 
 ## page web
 
-- leni-menage.org
+- leni-menage.fr
 
 
 # pouvoir sauvegarder des paternes
