@@ -13,14 +13,58 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 // Gestion des tâches
-document.querySelectorAll('.task-item').forEach(item => {
+function initTaskItem(item) {
     const checkbox = item.querySelector('.task-checkbox');
     const text = item.querySelector('.task-text');
+    const deleteBtn = item.querySelector('.task-delete');
     
+    // Gestion de la checkbox
     checkbox.addEventListener('click', (e) => {
         e.stopPropagation();
         checkbox.classList.toggle('checked');
         text.classList.toggle('completed');
+    });
+    
+    // Gestion de la suppression
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('Supprimer cette tâche ?')) {
+                item.remove();
+            }
+        });
+    }
+}
+
+// Initialiser toutes les tâches existantes
+document.querySelectorAll('.task-item').forEach(initTaskItem);
+
+// Fonction pour ajouter une nouvelle tâche
+function addTask(category) {
+    const taskList = category.querySelector('.task-list');
+    const newItem = document.createElement('li');
+    newItem.className = 'task-item';
+    newItem.innerHTML = `
+        <div class="task-checkbox"></div>
+        <input type="text" class="task-text" value="Nouvelle tâche" placeholder="Entrez une tâche...">
+        <button class="task-delete">🗑️</button>
+    `;
+    taskList.appendChild(newItem);
+    
+    // Initialiser les événements de la nouvelle tâche
+    initTaskItem(newItem);
+    
+    // Focus sur le champ de texte et sélectionner le texte
+    const input = newItem.querySelector('.task-text');
+    input.focus();
+    input.select();
+}
+
+// Gestion des boutons "Ajouter une tâche"
+document.querySelectorAll('.add-task-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const category = e.target.closest('.category');
+        addTask(category);
     });
 });
 
