@@ -48,6 +48,8 @@ function addTask(category) {
         <div class="task-checkbox"></div>
         <input type="text" class="task-text" value="Nouvelle tâche" placeholder="Entrez une tâche...">
         <button class="task-delete">🗑️</button>
+        <button class="add-task-btn"> + Ajouter une tâche</button>
+        
     `;
     taskList.appendChild(newItem);
     
@@ -61,11 +63,12 @@ function addTask(category) {
 }
 
 // Gestion des boutons "Ajouter une tâche"
-document.querySelectorAll('.add-task-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const category = e.target.closest('.category');
-        addTask(category);
-    });
+// Utilise la délégation d'événements pour gérer aussi les boutons ajoutés dynamiquement
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.add-task-btn');
+    if (!btn) return;
+    const category = btn.closest('.category');
+    if (category) addTask(category);
 });
 
 // Gestion du markdown
