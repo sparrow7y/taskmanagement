@@ -71,41 +71,123 @@ document.addEventListener('click', (e) => {
     if (category) addTask(category);
 });
 
-// Gestion du markdown
+// Gestion du markdown (protégé si les éléments sont absents)
 const editor = document.querySelector('.markdown-editor');
 const preview = document.querySelector('.markdown-preview');
 
-function updatePreview() {
-    const markdown = editor.value;
-    preview.innerHTML = marked.parse(markdown);
+if (editor && preview && typeof marked !== 'undefined') {
+    function updatePreview() {
+        const markdown = editor.value;
+        preview.innerHTML = marked.parse(markdown);
+    }
+
+    editor.addEventListener('input', updatePreview);
+    updatePreview();
+} else if ((editor || preview) && typeof marked === 'undefined') {
+    // Si l'utilisateur a inclus l'éditeur mais pas la lib marked, éviter les erreurs
+    console.warn('marked.js non disponible — aperçu markdown désactivé');
 }
 
-editor.addEventListener('input', updatePreview);
-updatePreview();
+// Gestion des paternes (utilise délégation et supporte suppression)
+const patternList = document.querySelector('.pattern-list');
+if (patternList) {
+    // Helper pour normaliser un nom en clé (ex: "Paterne 1" -> "paterne-1")
+    function normalizeName(name) {
+        return name.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    }
 
-// Gestion des paternes
-document.querySelectorAll('.pattern-item').forEach(item => {
-    item.addEventListener('click', () => {
+    // Initialiser les paternes existants : ajouter data-pattern et bouton de suppression si manquants
+    document.querySelectorAll('.pattern-item').forEach(item => {
+        const text = item.textContent.trim();
+        const key = normalizeName(text);
+        item.dataset.pattern = item.dataset.pattern || key;
+        // Si pas de bouton de suppression, en ajouter un
+        if (!item.querySelector('.pattern-delete')) {
+            // Retirer l'ancien texte pour éviter duplication si innerHTML est utilisé
+            const nameOnly = text.replace(/\u00D7|×|\u2215|🗑️/g, '').trim();
+            item.innerHTML = `${nameOnly} <button class="pattern-delete" title="Supprimer">🗑️</button>`;
+        }
+    });
+    // Délégation : clic sur un élément de la liste
+    patternList.addEventListener('click', (e) => {
+        const item = e.target.closest('.pattern-item');
+        if (!item) return;
+
+        // Si l'utilisateur a cliqué sur le bouton de suppression
+        if (e.target.classList.contains('pattern-delete')) {
+            e.stopPropagation();
+            if (confirm('Supprimer ce paterne ?')) {
+                item.remove();
+            }
+            return;
+        }
+
+        // Sinon, sélectionner le paterne
         document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('active'));
         item.classList.add('active');
     });
-});
 
-// Bouton ajouter paterne
-document.querySelector('.add-pattern-btn').addEventListener('click', () => {
-    const patternName = prompt('Nom du nouveau paterne:');
-    if (patternName) {
-        const list = document.querySelector('.pattern-list');
-        const newPattern = document.createElement('li');
-        newPattern.className = 'pattern-item';
-        newPattern.textContent = patternName;
-        newPattern.addEventListener('click', () => {
-            document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('active'));
-            newPattern.classList.add('active');
+    // Bouton ajouter paterne (protégé si absent)
+    const addPatternBtn = document.querySelector('.add-pattern-btn');
+    if (addPatternBtn) {
+        addPatternBtn.addEventListener('click', () => {
+            const patternName = prompt('Nom du nouveau paterne:');
+            if (patternName) {
+                const newPattern = document.createElement('li');
+                newPattern.className = 'pattern-item';
+                const key = normalizeName(patternName);
+                newPattern.dataset.pattern = key;
+                newPattern.innerHTML = `${patternName} <button class="pattern-delete" title="Supprimer">🗑️</button>`;
+                patternList.appendChild(newPattern);
+                // Sélectionner le nouveau paterne
+                document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('active'));
+                newPattern.classList.add('active');
+            }
         });
-        list.appendChild(newPattern);
     }
-});
+
+    // Gérer les interactions avec les onglets : sélection, création de paterne associée et fermeture
+    const tabs = document.querySelector('.tabs');
+    if (tabs) {
+        tabs.addEventListener('click', (e) => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            // Ignorer le bouton '+'
+            if (tab.classList.contains('tab-add')) return;
+
+            // Si on a cliqué sur la croix de fermeture
+            if (e.target.classList.contains('tab-close')) {
+                e.stopPropagation();
+                if (confirm('Fermer cet onglet ?')) {
+                    const key = tab.dataset.tab || normalizeName(tab.textContent.replace('×', '').trim());
+                    // Supprimer le paterne associé si existe
+                    const assoc = document.querySelector(`.pattern-item[data-pattern="${key}"]`);
+                    if (assoc) assoc.remove();
+                    tab.remove();
+                }
+                return;
+            }
+
+            // Sélectionner l'onglet
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Trouver ou créer le paterne associé
+            const tabName = tab.textContent.replace('×', '').trim();
+            const key = tab.dataset.tab || normalizeName(tabName);
+            let targetPattern = document.querySelector(`.pattern-item[data-pattern="${key}"]`);
+            if (!targetPattern) {
+                targetPattern = document.createElement('li');
+                targetPattern.className = 'pattern-item';
+                targetPattern.dataset.pattern = key;
+                targetPattern.innerHTML = `${tabName} <button class="pattern-delete" title="Supprimer">🗑️</button>`;
+                patternList.appendChild(targetPattern);
+            }
+            document.querySelectorAll('.pattern-item').forEach(p => p.classList.remove('active'));
+            targetPattern.classList.add('active');
+        });
+    }
+}
 
 // Gestion des onglets
 document.querySelectorAll('.tab').forEach(tab => {

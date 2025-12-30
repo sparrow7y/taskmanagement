@@ -247,6 +247,23 @@ body {
 .add-pattern-btn:hover {
     background: #1976D2;
 }
+.pattern-delete {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18x;
+    padding: 4px 8px;
+    ;
+    
+}
+.pattern-item:hover .pattern-delete {
+    opacity: 1;
+}
+
+.pattern-delete:hover {
+    background: #ffebee;
+    border-radius: 4px;
+}
 
 /* Zone Markdown */
 .markdown-section {
