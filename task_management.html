@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+    
+</head>
+<body>
+<div class="pattern">    
+    <div class="container">
+        <!-- Section principale -->
+        <div class="main-section">
+            <!-- Onglets -->
+            <div class="tabs">
+                <button class="tab active" data-tab="paterne1">
+                    paterne 1 <span class="tab-close">×</span>
+                </button>
+                <button class="tab-add">+</button>
+            </div>
+
+            <!-- Contenu -->
+            <div class="content">
+                <!-- Catégorie Nourriture -->
+                <div class="category">
+                    <h2 >
+                        <input type="text" class="category-title" value="Nourriture">
+                    </h2>
+                    <ul class="task-list" id="nourriture-list">
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <input type="text" class="task-text" value="Acheter des légumes">
+                            <button class="task-delete">🗑️</button>
+                            <button class="add-task-btn">+ Ajouter une tâche</button>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Catégorie Vêtements -->
+                <div class="category">
+                    <h2 >
+                        <input type="text" class="category-title" value="Vêtements">
+                    </h2>
+                    <ul class="task-list" id="vetements-list">
+                        <li class="task-item">
+                            <div class="task-checkbox"></div>
+                            <input type="text" class="task-text" value="Laver le linge">
+                            <button class="task-delete">🗑️</button>
+                            <button class="add-task-btn">+ Ajouter une tâche</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="add-category">
+                    <button class="add-category-btn">+ Ajouter une catégorie</button>
+                </div>
+            </div>
+            <div class="Save-container">
+                <button class="save-btn">Sauvegarder</button>
+            </div>
+        </div>
+
+        <!-- Panneau latéral -->
+         <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Paternes</h3>
+            </div>
+            <ul class="pattern-list">
+                <li class="pattern-item active">Courses</li>
+                <li class="pattern-item">Projet</li>
+            </ul>
+            <button class="add-pattern-btn">Ajouter paterne</button>
+        </div> 
+
+    </div>  
+
+</div>
+
+<!-- Modal pour l'association / création de paterne -->
+<div class="modal-overlay" id="pattern-modal" aria-hidden="true" style="display:none;">
+    <div class="modal">
+        <h3>Associer un paterne à l'onglet</h3>
+        <div class="modal-body">
+            <div class="modal-existing">
+                <label>Paternes existants :</label>
+                <ul class="modal-pattern-list"></ul>
+            </div>
+            <div class="modal-new">
+                <label>Ou créer un nouveau :</label>
+                <input type="text" class="modal-new-input" placeholder="Nom du nouveau paterne">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-cancel">Annuler</button>
+            <button class="modal-select">Choisir</button>
+            <button class="modal-create">Créer</button>
+        </div>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBDbKT-Mlw-2-5YZwyo7AoDZhPOZbkdFM",
+    authDomain: "task-management-9bc49.firebaseapp.com",
+    projectId: "task-management-9bc49",
+    storageBucket: "task-management-9bc49.firebasestorage.app",
+    messagingSenderId: "608780992030",
+    appId: "1:608780992030:web:9fe6d5dce28e3e2c28f80f",
+    measurementId: "G-JM2PG0BJM4"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+</body>
+</html>
