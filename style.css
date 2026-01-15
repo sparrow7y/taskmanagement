@@ -496,7 +496,7 @@ button:hover {
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 .create-account-link {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 .create-account-link a {
     display: block;
@@ -510,7 +510,6 @@ button:hover {
 .create-account-link {
     width: 100%;
     padding: 8px;
-    border: 1px solid #aaa;
     border-radius: 5px;
 }
 .main-content {
