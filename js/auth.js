@@ -37,8 +37,8 @@ const db = getFirestore(app);
 // When already logged in, redirect to tasks page
 onAuthStateChanged(auth, (user) => {
   const path = window.location.pathname;
-  if (user && (path.endsWith("index.html") || path.endsWith("creer_un_compte.html"))) {
-    window.location.href = "task_management.html";
+  if (user && (path.endsWith("index.html") || path.endsWith("register.html"))) {
+    window.location.href = "tasks.html";
   }
 });
 
@@ -66,7 +66,7 @@ if (registerForm) {
         createdAt: serverTimestamp()
       });
 
-      window.location.href = "task_management.html";
+      window.location.href = "tasks.html";
     } catch (err) {
       registerError.textContent = err.message;
       console.error(err);
@@ -95,7 +95,7 @@ if (loginForm) {
       const password = document.getElementById("login-password").value;
 
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "task_management.html";
+      window.location.href = "tasks.html";
     } catch (err) {
       loginError.textContent = err.message;
       console.error(err);
