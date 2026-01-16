@@ -424,10 +424,15 @@ function showPatternModal() {
                 li.classList.add('selected');
                 newInput.value = '';
             });
+            li.addEventListener('dblclick', () => {
+                // Double-click to quickly select and close
+                onSelect();
+            });
             list.appendChild(li);
         });
 
         newInput.value = '';
+        newInput.focus();
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden', 'false');
 
@@ -438,24 +443,36 @@ function showPatternModal() {
             btnCancel.removeEventListener('click', onCancel);
             btnSelect.removeEventListener('click', onSelect);
             btnCreate.removeEventListener('click', onCreate);
+            newInput.removeEventListener('keydown', onInputKeydown);
             modal.removeEventListener('click', onOverlay);
         }
         function onCancel() { cleanup(); resolve(null); }
         function onSelect() {
             const sel = list.querySelector('.modal-pattern-item.selected');
-            if (sel) { cleanup(); resolve({ type: 'existing', key: sel.dataset.pattern, name: sel.textContent.trim() }); }
-            else { alert('Sélectionnez un paterne ou entrez un nouveau nom.'); }
+            if (sel) { 
+                cleanup(); 
+                resolve({ type: 'existing', key: sel.dataset.pattern, name: sel.textContent.trim() }); 
+            }
         }
         function onCreate() {
             const v = newInput.value.trim();
-            if (!v) { alert('Entrez le nom du nouveau paterne.'); newInput.focus(); return; }
-            cleanup(); resolve({ type: 'new', name: v });
+            if (!v) { newInput.focus(); return; }
+            cleanup(); 
+            resolve({ type: 'new', name: v });
         }
         function onOverlay(e) { if (e.target === modal) { onCancel(); } }
+        function onInputKeydown(e) {
+            if (e.key === 'Enter') {
+                onCreate();
+            } else if (e.key === 'Escape') {
+                onCancel();
+            }
+        }
 
         btnCancel.addEventListener('click', onCancel);
         btnSelect.addEventListener('click', onSelect);
         btnCreate.addEventListener('click', onCreate);
+        newInput.addEventListener('keydown', onInputKeydown);
         modal.addEventListener('click', onOverlay);
     });
 }
@@ -520,8 +537,156 @@ document.querySelector('.tab-add').addEventListener('click', async () => {
     showTabContent(patternKey);
 });
 
+// Fonction pour sauvegarder toutes les données
+function saveAllData() {
+    const data = {
+        tabs: [],
+        patterns: [],
+        tabContents: {},
+        timestamp: new Date().toISOString()
+    };
+
+    // Sauvegarder les onglets
+    document.querySelectorAll('.tab').forEach(tab => {
+        if (!tab.classList.contains('tab-add')) {
+            const key = tab.dataset.tab || normalizeName(tab.textContent.replace('×', '').trim());
+            const name = tab.textContent.replace('×', '').trim();
+            data.tabs.push({
+                key: key,
+                name: name,
+                isActive: tab.classList.contains('active')
+            });
+        }
+    });
+
+    // Sauvegarder les paternes
+    document.querySelectorAll('.pattern-item').forEach(pattern => {
+        const patternText = pattern.querySelector('.pattern-text');
+        const name = patternText ? patternText.textContent.trim() : pattern.textContent.trim();
+        const key = pattern.dataset.pattern || normalizeName(name);
+        data.patterns.push({
+            key: key,
+            name: name,
+            isActive: pattern.classList.contains('active')
+        });
+    });
+
+    // Sauvegarder le contenu de chaque onglet (catégories et tâches)
+    document.querySelectorAll('.tab-content').forEach(tabContent => {
+        const key = tabContent.dataset.tab;
+        if (key) {
+            const categories = [];
+            
+            tabContent.querySelectorAll('.category').forEach(category => {
+                const titleInput = category.querySelector('.category-title');
+                const categoryName = titleInput ? titleInput.value : 'Catégorie sans nom';
+                const tasks = [];
+                
+                category.querySelectorAll('.task-item').forEach(taskItem => {
+                    const checkbox = taskItem.querySelector('.task-checkbox');
+                    const taskInput = taskItem.querySelector('.task-text');
+                    
+                    tasks.push({
+                        text: taskInput ? taskInput.value : '',
+                        completed: checkbox ? checkbox.classList.contains('checked') : false
+                    });
+                });
+                
+                categories.push({
+                    name: categoryName,
+                    tasks: tasks
+                });
+            });
+            
+            data.tabContents[key] = categories;
+        }
+    });
+
+    // Sauvegarder dans localStorage
+    try {
+        localStorage.setItem('taskManagementData', JSON.stringify(data));
+        
+        // Afficher une notification de succès
+        showSaveNotification('✓ Données sauvegardées avec succès');
+        
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde:', error);
+        showSaveNotification('✗ Erreur lors de la sauvegarde', true);
+        return false;
+    }
+}
+
+// Fonction pour afficher une notification de sauvegarde
+function showSaveNotification(message, isError = false) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        background: ${isError ? '#f44336' : '#4CAF50'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Retirer la notification après 3 secondes
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Ajouter les animations CSS pour les notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Fonction pour restaurer les données sauvegardées
+function restoreSavedData() {
+    try {
+        const savedData = localStorage.getItem('taskManagementData');
+        if (!savedData) return false;
+        
+        const data = JSON.parse(savedData);
+        console.log('Données restaurées:', data);
+        // Les données seront restaurées au besoin
+        return data;
+    } catch (error) {
+        console.error('Erreur lors de la restauration:', error);
+        return false;
+    }
+}
+
 document.querySelector('.save-btn').addEventListener('click', () => {
-    alert('Fonction de sauvegarde non implémentée.');
+    saveAllData();
 });
 
 // Gestion des catégories : helper pour initialiser une catégorie (supprimer + comportement interne)
@@ -619,5 +784,12 @@ document.addEventListener('click', (e) => {
     if (firstInput) {
         firstInput.focus();
         firstInput.select();
+    }
+});
+
+document.querySelector('.logout-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        window.location.href = 'index.html';
     }
 });
