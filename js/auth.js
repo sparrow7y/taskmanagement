@@ -14,6 +14,15 @@ const firebaseConfig = {
   measurementId: "G-JM2PG0BJM4"
 };
 
+// Sdk admin firebase
+var admin = require("firebase-admin");
+
+var serviceAccount = require("path/to/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
