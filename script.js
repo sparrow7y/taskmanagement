@@ -538,7 +538,7 @@ document.querySelector('.tab-add').addEventListener('click', async () => {
 });
 
 // Fonction pour sauvegarder toutes les données
-function saveAllData() {
+async function saveAllData() {
     const data = {
         tabs: [],
         patterns: [],
@@ -605,10 +605,20 @@ function saveAllData() {
     // Sauvegarder dans localStorage
     try {
         localStorage.setItem('taskManagementData', JSON.stringify(data));
-        
-        // Afficher une notification de succès
-        showSaveNotification('✓ Données sauvegardées avec succès');
-        
+
+        // Try saving to Firestore if function is available
+        if (window.saveToFirestore && typeof window.saveToFirestore === 'function') {
+            try {
+                await window.saveToFirestore(data);
+                showSaveNotification('✓ Données sauvegardées sur Firestore');
+            } catch (err) {
+                console.warn('Impossible de sauvegarder sur Firestore:', err);
+                showSaveNotification('✓ Données sauvegardées localement (Firestore échoué)', true);
+            }
+        } else {
+            showSaveNotification('✓ Données sauvegardées localement');
+        }
+
         return true;
     } catch (error) {
         console.error('Erreur lors de la sauvegarde:', error);
@@ -685,9 +695,12 @@ function restoreSavedData() {
     }
 }
 
-document.querySelector('.save-btn').addEventListener('click', () => {
-    saveAllData();
-});
+const saveBtn = document.querySelector('.save-btn');
+if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+        await saveAllData();
+    });
+}
 
 // Gestion des catégories : helper pour initialiser une catégorie (supprimer + comportement interne)
 function initCategory(category) {

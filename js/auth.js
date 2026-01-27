@@ -13,16 +13,6 @@ const firebaseConfig = {
   appId: "1:608780992030:web:9fe6d5dce28e3e2c28f80f",
   measurementId: "G-JM2PG0BJM4"
 };
-
-// Sdk admin firebase
-var admin = require("firebase-admin");
-
-var serviceAccount = require("path/to/serviceAccountKey.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
@@ -46,8 +36,14 @@ const db = getFirestore(app);
 // When already logged in, redirect to tasks page
 onAuthStateChanged(auth, (user) => {
   const path = window.location.pathname;
-  if (user && (path.endsWith("index.html") || path.endsWith("register.html"))) {
+  const onAuthPages = path.endsWith("index.html") || path.endsWith("register.html") || path === "/" || path === "";
+  if (user && onAuthPages) {
     window.location.href = "tasks.html";
+    return;
+  }
+  // If not authenticated and trying to access protected page, redirect to login
+  if (!user && path.endsWith("tasks.html")) {
+    window.location.href = "index.html";
   }
 });
 
@@ -62,7 +58,7 @@ if (registerForm) {
     if (!registerSubmit) {
       return;
     }
-    registerError.textContent = "error";
+    if (registerError) registerError.textContent = "";
     registerSubmit.disabled = true;
     try {
       const email    = document.getElementById("register-email").value;
@@ -96,7 +92,7 @@ if (loginForm) {
     if (!loginSubmit) {
       return;
     }
-    loginError.textContent = "error";
+    if (loginError) loginError.textContent = "";
     loginSubmit.disabled = true;
 
     try {
