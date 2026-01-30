@@ -19,7 +19,7 @@ the website is divised in three part.
 - leni-menage.fr
 
 
-# pouvoir sauvegarder des paternes
+# save button
 - save button to save the page
 
 
